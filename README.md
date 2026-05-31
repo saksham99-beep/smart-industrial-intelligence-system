@@ -1,0 +1,1 @@
+# smart-industrial-intelligence-system
