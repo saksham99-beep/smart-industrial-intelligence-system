@@ -1,0 +1,16 @@
+Unit-204 frequently experiences vibration spikes due to bearing wear and shaft imbalance.
+
+High temperature above 85°C may indicate lubrication failure or cooling malfunction.
+
+Recommended predictive maintenance includes vibration analysis, thermal inspection, and rotating equipment diagnostics.
+
+Emergency SOP:
+1. Stop industrial unit
+2. Disconnect power
+3. Lockout-tagout
+4. Inspect damaged assembly
+5. Verify restart safety
+
+Pressure fluctuation may indicate valve instability or pipeline leakage.
+
+Industrial anomaly detection uses sensor trends, vibration frequency, thermal deviation, and operational thresholds.
