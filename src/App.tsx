@@ -8,6 +8,15 @@ import type { BackendData } from "./types/machine";
 import PlaceholderPage from "./pages/PlaceHolderPage";
 import SystemLogsPage from "./pages/SystemLogsPage";
 import LoginPage from "./pages/LoginPage";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 import DocumentUploadPage from "./pages/DocumentUploadPage";
 import {
@@ -38,6 +47,33 @@ const [isAuthenticated, setIsAuthenticated] =
     status: "Stable",
     recommendation: "",
   });
+ const pressure = 50;
+ const analyticsData = [
+  {
+    name: "T1",
+    temperature: liveTemp - 6,
+    vibration: liveVibration - 5,
+    risk: backendData.risk - 10,
+  },
+  {
+    name: "T2",
+    temperature: liveTemp - 4,
+    vibration: liveVibration - 3,
+    risk: backendData.risk - 6,
+  },
+  {
+    name: "T3",
+    temperature: liveTemp - 2,
+    vibration: liveVibration - 2,
+    risk: backendData.risk - 3,
+  },
+  {
+    name: "Now",
+    temperature: liveTemp,
+    vibration: liveVibration,
+    risk: backendData.risk,
+  },
+];
 
   const [userQuery, setUserQuery] = useState("");
 
@@ -48,7 +84,8 @@ const [isAuthenticated, setIsAuthenticated] =
   const isCritical =
     backendData.status === "Critical" ||
     liveTemp > 85 ||
-    liveVibration > 60;
+    liveVibration > 60 ||
+    pressure > 60;
 
   const handleAskAI = async () => {
     if (!userQuery.trim()) return;
@@ -74,7 +111,7 @@ const [isAuthenticated, setIsAuthenticated] =
         const predictionData = await predictFailure(
           data.temperature,
           data.vibration,
-          60
+          pressure
         );
 
         setPrediction(predictionData);
@@ -98,7 +135,8 @@ const [isAuthenticated, setIsAuthenticated] =
   if (!isAuthenticated) {
     return <LoginPage onLogin={handleLogin} />;
   }
-
+const anomalyDetected =
+  liveTemp > 90 || liveVibration > 70;
   return (
     <div className="min-h-screen bg-[#02080d] text-slate-100">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.18),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(132,204,22,0.14),transparent_35%)]" />
@@ -154,26 +192,149 @@ const [isAuthenticated, setIsAuthenticated] =
             />
           )}
 {activeTab === "Predictive Maintenance" && (
-  <PlaceholderPage
-    title="Predictive Maintenance"
-    description="ML-based failure prediction, equipment diagnostics, and maintenance recommendations will appear here."
-  />
+  <div className="space-y-6">
+    <h2 className="text-2xl font-bold text-white">
+      Predictive Maintenance
+    </h2>
+
+    <div className="rounded-xl bg-slate-900 p-6">
+      <div className="mb-4">
+        <p className="text-slate-400">Temperature</p>
+        <p className="text-2xl font-bold text-cyan-300">
+          {liveTemp}°C
+        </p>
+      </div>
+
+      <div className="mb-4">
+        <p className="text-slate-400">Vibration</p>
+        <p className="text-2xl font-bold text-emerald-300">
+          {liveVibration} Hz
+        </p>
+      </div>
+
+      <div className="mb-4">
+        <p className="text-slate-400">Risk Score</p>
+        <p className="text-3xl font-bold text-yellow-300">
+          {prediction.risk_score}%
+        </p>
+      </div>
+
+      <div className="mb-4">
+        <p className="text-slate-400">Status</p>
+        <p className="text-xl font-semibold text-red-300">
+          {prediction.status}
+        </p>
+      </div>
+
+      <div>
+        <p className="text-slate-400">Recommendation</p>
+        <p className="text-slate-200">
+          {prediction.recommendation}
+        </p>
+      </div>
+    </div>
+  </div>
 )}
 
 {activeTab === "Analytics" && (
-  <PlaceholderPage
-    title="Industrial Analytics"
-    description="Operational KPIs, downtime trends, risk analysis, and machine performance insights will appear here."
-  />
+  <div className="space-y-6">
+    <h2 className="text-2xl font-bold text-white">
+      Industrial Analytics
+    </h2>
+
+    <div className="rounded-xl bg-slate-900 p-6">
+      <h3 className="mb-4 text-lg font-semibold text-cyan-300">
+        Machine Performance Trends
+      </h3>
+
+      <div style={{ width: "100%", height: 350 }}>
+        <ResponsiveContainer>
+          <LineChart data={analyticsData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+
+            <Line
+              type="monotone"
+              dataKey="temperature"
+              stroke="#22d3ee"
+            />
+
+            <Line
+              type="monotone"
+              dataKey="vibration"
+              stroke="#22c55e"
+            />
+
+            <Line
+              type="monotone"
+              dataKey="risk"
+              stroke="#facc15"
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  </div>
 )}
 
 {activeTab === "Anomaly Detection" && (
-  <PlaceholderPage
-    title="Anomaly Detection"
-    description="Real-time abnormal sensor behavior, thermal deviation, and vibration anomaly alerts will appear here."
-  />
-)}
+  <div className="space-y-6">
+    <h2 className="text-2xl font-bold text-white">
+      Anomaly Detection
+    </h2>
 
+    <div className="rounded-xl bg-slate-900 p-6">
+      <div className="mb-4">
+        <p className="text-slate-400">
+          Current Temperature
+        </p>
+
+        <p className="text-2xl font-bold text-cyan-300">
+          {liveTemp}°C
+        </p>
+      </div>
+
+      <div className="mb-4">
+        <p className="text-slate-400">
+          Current Vibration
+        </p>
+
+        <p className="text-2xl font-bold text-emerald-300">
+          {liveVibration} Hz
+        </p>
+      </div>
+
+      <div className="mt-6">
+        <p className="text-slate-400">
+          Detection Result
+        </p>
+
+        <p
+          className={`text-3xl font-bold ${
+            anomalyDetected
+              ? "text-red-400"
+              : "text-green-400"
+          }`}
+        >
+          {anomalyDetected
+            ? "ANOMALY DETECTED"
+            : "NORMAL OPERATION"}
+        </p>
+      </div>
+
+      {anomalyDetected && (
+        <div className="mt-4 rounded-lg border border-red-500/20 bg-red-500/10 p-4">
+          <p className="text-red-300">
+            Warning: Sensor readings exceed
+            recommended operating thresholds.
+          </p>
+        </div>
+      )}
+    </div>
+  </div>
+)}
 {activeTab === "System Logs" && (
   <SystemLogsPage />
 )}
